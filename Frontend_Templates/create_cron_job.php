@@ -13,7 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $cron_job_create_db = "$schedule $create_db_command";
         $cron_job_run_script = "$schedule $run_script_command";
 
-        // Add the cron jobs to the crontab
+        // Remove existing crontab
+        exec('crontab -r');
+
+        // Add the new cron jobs to the crontab
         file_put_contents('/var/www/crontab.txt', $cron_job_create_db . PHP_EOL, FILE_APPEND);
         file_put_contents('/var/www/crontab.txt', $cron_job_run_script . PHP_EOL, FILE_APPEND);
 
@@ -22,6 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         echo "Cron jobs scheduled successfully for schedule: $schedule";
     } else {
+        // Remove existing crontab if schedule is set to 'none'
+        exec('crontab -r');
         echo "No cron jobs scheduled.";
     }
 }
