@@ -225,3 +225,42 @@ window.addEventListener('load', function() {
     }
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+    // Add event listener to the Submit Schedule button
+    document.getElementById("submitScheduleButton").addEventListener("click", handleSubmitSchedule);
+});
+// Function to handle the submit schedule button click event
+function handleSubmitSchedule() {
+    // Get the selected schedule value from the dropdown
+    const scheduleDropdown = document.getElementById("scheduleDropdown");
+    const selectedSchedule = scheduleDropdown.value;
+
+    // Send the selected schedule value to the server
+    sendScheduleToServer(selectedSchedule);
+}
+
+// Function to send the selected schedule value to the server
+function sendScheduleToServer(schedule) {
+    // Create an object to hold the data to be sent
+    const data = { schedule: schedule };
+
+    // Send an AJAX request to the server using fetch API
+    fetch('create_cron_job.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to create cron job');
+        }
+        console.log('Cron job created successfully');
+        // You can perform further actions here if needed
+    })
+    .catch(error => {
+        console.error('Error creating cron job:', error);
+        // Handle the error accordingly
+    });
+}

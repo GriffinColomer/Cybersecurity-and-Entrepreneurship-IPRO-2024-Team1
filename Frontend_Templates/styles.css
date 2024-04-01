@@ -224,7 +224,6 @@ button:hover {
     flex: 1; /* Take up remaining space */
     padding: 20px;
     border-radius: 10px;
-    margin-right: 20px; 
 }
 .monitoring-content {
     display: flex;
@@ -281,9 +280,10 @@ button:hover {
 
 .scan-devices-container {
     background-color: rgba(255, 255, 255, 0.2);
+    min-width: 300px;
     padding: 20px; /* Add padding for spacing */
     border-radius: 10px; /* Add border radius for rounded corners */
-    margin-right: 10px; /* Add margin to separate from monitoring container */
+    margin-right: 0px; /* Add margin to separate from monitoring container */
     display: flex; /* Use flexbox for layout */
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
@@ -317,6 +317,7 @@ button:hover {
     display: flex; /* Use flexbox */
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
+    margin-bottom: 20px;
 }
 
 #progress-bar {
@@ -330,7 +331,51 @@ button:hover {
     animation: progressBarAnimation 2s infinite alternate; /* Animated effect */
 }
 
+/* Dropdown Container Styles */
+.dropdown-container {
+    border-radius: 10px;
+    max-width: 200px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.2);
+    gap: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
 
+#submitScheduleButton {
+    margin-bottom: 10px;
+}
+
+.dropdown-container select {
+    margin-bottom: 10px; /* Add margin to bottom of the select */
+}
+
+.dropdown-container button {
+    margin-top: 10px; /* Add margin to top of the button */
+}
+.scheduleDropdown label {
+    color: #ffffff;
+    display: block; /* Ensure it's displayed as a block */
+    margin-top: 5px; /* Adjusted margin */
+    text-align: center; /* Center-align the text */
+}
+
+#submitScheduleButton {
+    padding: 10px 20px; /* Add padding to the button */
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    background-color: #3498db; /* Blue color */
+    color: #ffffff;
+    border: none;
+    margin-bottom: 10px; /* Add margin to bottom of the button */
+    margin-top: 0; /* Remove default margin from top */
+}
 
 /* Device Section Styles */
 .deviceSections {
@@ -420,6 +465,7 @@ button:hover {
     padding: 20px; /* Add padding for spacing */
     margin-top: 20px;
     margin-bottom: 20px;
+    max-height: 120px;
     border-radius: 10px; /* Add border radius for rounded corners */
     margin-right: 10px; /* Add margin to separate from monitoring container */
     display: flex; /* Use flexbox for layout */
