@@ -24,6 +24,7 @@ from selenium.webdriver.chrome.options import Options
 
 def generate_secure_password(length=16, include_uppercase=True, include_numbers=True, include_special_chars=True):
     # Define character sets
+    special_chars_included = False
     lowercase_letters = string.ascii_lowercase
     uppercase_letters = string.ascii_uppercase if include_uppercase else ""
     digits = string.digits if include_numbers else ""
@@ -35,7 +36,11 @@ def generate_secure_password(length=16, include_uppercase=True, include_numbers=
         raise ValueError("At least one character set must be included")
 
     password = ''.join(secrets.choice(all_characters) for _ in range(length))
-    return password
+    for character in special_chars:
+        if character in password:
+            return password
+        else:
+            generate_secure_password()
 
 password_field = ''
 newpass = generate_secure_password()
