@@ -14,15 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $cron_job_run_script = "$schedule $run_script_command";
 
         // Specify the directory for the crontab.txt file
-        $crontab_file_path = '../../crontab.txt'; // Adjust as needed
+        $crontab_file_path = '../../crontab.txt';
 
         // Add the new cron jobs to the crontab
         file_put_contents($crontab_file_path, $cron_job_create_db . PHP_EOL);
         file_put_contents($crontab_file_path, $cron_job_run_script . PHP_EOL, FILE_APPEND);
-
         // Install updated crontab
-        $output = shell_exec("crontab $crontab_file_path");
-        
+        shell_exec('crontab -u secure ../../crontab');
         echo "Cron jobs scheduled successfully for schedule: $schedule";
     } else {
         // Remove existing crontab if schedule is set to 'none'
