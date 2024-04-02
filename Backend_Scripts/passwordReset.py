@@ -39,8 +39,7 @@ def generate_secure_password(length=16, include_uppercase=True, include_numbers=
     for character in special_chars:
         if character in password:
             return password
-        else:
-            generate_secure_password()
+    generate_secure_password()
 
 password_field = ''
 newpass = generate_secure_password()
