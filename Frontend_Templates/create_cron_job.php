@@ -20,12 +20,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         file_put_contents($crontab_file_path, $cron_job_create_db . PHP_EOL);
         file_put_contents($crontab_file_path, $cron_job_run_script . PHP_EOL, FILE_APPEND);
         // Install updated crontab
-        shell_exec('crontab -u secure ../../crontab');
-        echo "Cron jobs scheduled successfully for schedule: $schedule";
+        shell_exec('sudo crontab ../../crontab.txt');
+        $output = shell_exec('sudo crontab -l');
+        echo json_encode(['output' => $output, 'schedule' => $schedule]);
+
     } else {
         // Remove existing crontab if schedule is set to 'none'
-        exec('crontab -r');
-        echo "No cron jobs scheduled.";
+        shell_exec('sudo crontab -r');
+        echo json_encode(["message" => "No cron jobs scheduled."]);
+
+
     }
 }
 ?>

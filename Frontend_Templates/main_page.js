@@ -101,7 +101,7 @@ async function showDevices() {
                 <p>Device Accessible: ${device.Accessible ? 'Yes' : 'No'}</p>
                 <p>Device has Password Field: ${device.hasPasswordField ? 'Yes' : 'No'}</p>
                 <p>Password Changed Date: ${device.lastPasswordChange}</p>
-                ${device.flagged ? `<button onclick="changePassword('${deviceName}', '${device.MAC}', '${device.IP}')">Change Password</button>` : ''}
+                ${device.Accessible ? `<button onclick="changePassword('${deviceName}', '${device.MAC}', '${device.IP}')">Change Password</button>` : ''}
             </div>
         `;
 
@@ -239,7 +239,6 @@ function handleSubmitSchedule() {
     sendScheduleToServer(selectedSchedule);
 }
 
-// Function to send the selected schedule value to the server
 function sendScheduleToServer(schedule) {
     // Create an object to hold the data to be sent
     const data = { schedule: schedule };
@@ -256,11 +255,23 @@ function sendScheduleToServer(schedule) {
         if (!response.ok) {
             throw new Error('Failed to create cron job');
         }
-        console.log('Cron job created successfully');
-        // You can perform further actions here if needed
+        // Parse JSON response
+        return response.json();
+    })
+    .then(data => {
+        // Check if data contains error message
+        if (data.error) {
+            console.error('Error creating cron job:', data.error);
+        } else {
+            console.log('Cron job created successfully');
+            // Output the echoed JSON
+            console.log('Response:', data);
+            // You can perform further actions here if needed
+        }
     })
     .catch(error => {
-        console.error('Error creating cron job:', error);
+        console.error('Error creating cron job:', error.message);
         // Handle the error accordingly
     });
 }
+
