@@ -7,6 +7,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException, TimeoutException
+
 
 def checkLastPasswordChange(macaddress):
     try:
@@ -79,6 +83,52 @@ def ping_device(IP):
         # Handle any exceptions that occur
         return False
 
+def test_flagged(ip, potential_passwords):
+    driver = init_driver()
+    print("Currently attempting to log in to", ip)
+    global last_tried_password
+    try:
+        driver.get(f'http://{ip}')
+        sleep(1)
+        password_field = driver.find_element(By.CSS_SELECTOR, "input[type='password']")
+
+        for password in potential_passwords:
+            try:
+                login_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Login')]")
+                password_field.clear()
+                password_field.send_keys(password)
+                login_button.click()
+                last_tried_password = password
+                WebDriverWait(driver, 1).until(EC.invisibility_of_element(login_button))
+                print(f"Success with password: {password}")
+                return True
+            except TimeoutException:
+                print(f"Failed with password: {password}")
+            except NoSuchElementException:
+                print("Login elements not found, checking next password or ending test.")
+                break
+        return False
+    except NoSuchElementException as e:
+        print(f"Could not find the password field on {ip}: {e}")
+        return False
+    except Exception as e:
+        print(f"An error occurred while attempting to log in to {ip}: {e}")
+        return False
+    
+def potential_passwords(company, filename):
+    passwords = []
+
+    # Read data from JSON file
+    with open(filename, 'r') as file:
+        data = json.load(file)
+    
+    # Iterate through each dictionary in the data
+    for item in data:
+        if item["company"] == company:
+            passwords.append(item["password"])
+    
+    return passwords
+
 def lookup_mac(mac_address):
     api_url = f"https://api.maclookup.app/v2/macs/{mac_address}/company/name"
     headers = {'X-Authentication-Token': '01hpfz52rgcmadx8fj1nk2hvbf01hpfzbn2yc9fwk95sma3s7xenjgbkij9m0nrc'}
@@ -105,7 +155,7 @@ def arp_scan(ip):
         result[f'Device {i+1}'] = {'IP': received.psrc,
                                    'MAC': received.hwsrc,
                                    'Company': lookup_mac(received.hwsrc),
-                                   'flagged': False,
+                                   'flagged': test_flagged(received.psrc,potential_passwords(lookup_mac(received.hwsrc),"../Frontend_Templates/login_data.json")),
                                    'passwordChanged': passwordChanged,                                   'lastPasswordChange': lasPasswordChange,
                                    'Accessible': ping_device(received.psrc),
                                    'hasPasswordField': has_password_field(received.psrc) }
