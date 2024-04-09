@@ -322,14 +322,13 @@ button:hover {
 
 #progress-bar {
     height: 100%;
-    padding: 10px;
     background: linear-gradient(90deg, #42677f, #02562c); /* Gradient from light blue to dark blue */
     border-radius: 10px;
-    width: 0%; /* Initial width of the progress bar */
-    margin-bottom: 20px;
+    width: 0%; 
     transition: width 0.5s ease; /* Smooth transition for width */
-    animation: progressBarAnimation 2s infinite alternate; /* Animated effect */
+    float: left; /* Ensures the progress bar starts from the left */
 }
+
 
 /* Dropdown Container Styles */
 .dropdown-container {
@@ -429,7 +428,7 @@ button:hover {
 }
 
 .device p {
-    color: #ffffff;
+    color: #000000;
     margin-bottom: 10px; /* Increased margin for better separation */
 }
 .deviceHeader {
