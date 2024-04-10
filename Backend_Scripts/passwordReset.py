@@ -100,8 +100,8 @@ def attempt_login(driver, ip, macaddress):
             try:
                 try:
                     login_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, selector)))
-                if login_button:
-                    break
+                    if login_button:
+                        break
             except TimeoutException:
                 pass
 
