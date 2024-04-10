@@ -67,7 +67,7 @@ def attempt_login(driver, ip, macaddress):
 
     # Read the password file and check for a matching MAC address
     try:
-        with open("../../../passwords", "r") as file:
+        with open("../../passwords", "r") as file:
             lines = file.readlines()
             for line in lines:
                 parts = line.strip().split(", ")
