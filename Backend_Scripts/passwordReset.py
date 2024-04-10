@@ -87,7 +87,6 @@ def attempt_login(driver, ip, macaddress):
         password_field = driver.find_element(By.CSS_SELECTOR, "input[type='password']")
 
         # Try different methods to find the login button
-        login_button = None
         login_button_selectors = [
             "//button[contains(text(), 'Login') or contains(text(), 'Submit')]",
             "//button",
@@ -96,11 +95,14 @@ def attempt_login(driver, ip, macaddress):
             "//input[@type='submit']"
         ]
 
+        login_button = None
         for selector in login_button_selectors:
             try:
-                login_button = driver.find_element(By.XPATH, selector)
-                break
-            except NoSuchElementException:
+                try:
+                    login_button = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, selector)))
+                if login_button:
+                    break
+            except TimeoutException:
                 pass
 
         if login_button is None:
