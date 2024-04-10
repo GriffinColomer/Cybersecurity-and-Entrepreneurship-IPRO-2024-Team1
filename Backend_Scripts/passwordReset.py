@@ -60,9 +60,23 @@ def init_driver():
     return driver
 
 
-def attempt_login(driver, ip):
+def attempt_login(driver, ip, macaddress):
     print("Currently attempting to log in to", ip)
     global last_tried_password
+    known_password = ""
+
+    # Read the password file and check for a matching MAC address
+    try:
+        with open("../../../passwords", "r") as file:
+            lines = file.readlines()
+            for line in lines:
+                parts = line.strip().split(", ")
+                if parts[0] == macaddress:
+                    known_password = parts[1]
+                    break
+    except FileNotFoundError:
+        print("Password file not found.")
+
     try:
         driver.get(f'http://{ip}')
         sleep(1)
@@ -98,6 +112,32 @@ def attempt_login(driver, ip):
             for username in potential_usernames:
                 username_field = driver.find_element(By.CSS_SELECTOR, "input[type='text'], input[type='username']")
                 username_field.clear()
+
+                # Try known password first if available
+                if known_password:
+                    username_field.send_keys(username)
+                    password_field = driver.find_element(By.CSS_SELECTOR, "input[type='password']")
+                    password_field.clear()
+                    password_field.send_keys(known_password)
+                    login_button.click()
+                    last_tried_password = known_password
+
+                    # Check for the presence of the popup
+                    try:
+                        WebDriverWait(driver, 1).until(EC.alert_is_present())
+                        alert = driver.switch_to.alert
+                        alert.accept()
+                        print(f"Failed with username: {username} and known password: {known_password}")
+                    except TimeoutException:
+                        # Check for the presence of a password field after the login attempt
+                        try:
+                            WebDriverWait(driver, 1).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='password']")))
+                            print(f"Failed with username: {username} and known password: {known_password}")
+                        except TimeoutException:
+                            print(f"Success with username: {username} and known password: {known_password}")
+                            return True
+
                 for password in potential_passwords:
                     try:
                         username_field = driver.find_element(By.CSS_SELECTOR,
@@ -132,6 +172,30 @@ def attempt_login(driver, ip):
                         break
         except NoSuchElementException:
             print("No username field found. Proceeding with password attempts.")
+
+            # Try known password first if available
+            if known_password:
+                password_field.clear()
+                password_field.send_keys(known_password)
+                login_button.click()
+                last_tried_password = known_password
+
+                # Check for the presence of the popup
+                try:
+                    WebDriverWait(driver, 1).until(EC.alert_is_present())
+                    alert = driver.switch_to.alert
+                    alert.accept()
+                    print(f"Failed with known password: {known_password}")
+                except TimeoutException:
+                    # Check for the presence of a password field after the login attempt
+                    try:
+                        WebDriverWait(driver, 3).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='password']")))
+                        print(f"Failed with known password: {known_password}")
+                    except TimeoutException:
+                        print(f"Success with known password: {known_password}")
+                        return True
+
             for password in potential_passwords:
                 try:
                     password_field.clear()
@@ -141,7 +205,7 @@ def attempt_login(driver, ip):
 
                     # Check for the presence of the popup
                     try:
-                        WebDriverWait(driver, 3).until(EC.alert_is_present())
+                        WebDriverWait(driver, 1).until(EC.alert_is_present())
                         alert = driver.switch_to.alert
                         alert.accept()
                         print(f"Failed with password: {password}")
@@ -288,9 +352,9 @@ def find_clickable_ancestor_and_click(start_element_xpath):
 driver = init_driver()
 
 
-def auto_reset_pass(ip):
+def auto_reset_pass(ip, macaddress):
     print("Method has begun to try to reset password of ", ip)
-    if attempt_login(driver, ip):
+    if attempt_login(driver, ip, macaddress):
         find_pass_reset_page()
     driver.quit()
     return json.dumps({"new_password": newpass})
@@ -332,7 +396,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         ip = sys.argv[1]
         macaddress = sys.argv[2]
-        result = auto_reset_pass(ip)
+        result = auto_reset_pass(ip, macaddress)
         write_password(macaddress, newpass)
         update_deviceLog_date(macaddress)
     else:
